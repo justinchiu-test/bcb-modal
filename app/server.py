@@ -53,3 +53,15 @@ async def main():
         futures.append(run.remote.aio(example))
     all_outcomes = asyncio.gather(*futures)
     pdb.set_trace()
+
+
+web_image = modal.Image.debian_slim(python_version="3.10")
+
+
+@app.function(image=web_image, timeout=60*20)
+@modal.web_endpoint(
+    method="POST", label=f"runtest",
+)
+def runtest(data) -> list[str]:
+    """Generate responses to a batch of prompts, optionally with custom inference settings."""
+    return run.remote(data)
