@@ -64,7 +64,7 @@ async def main():
     for example in complete_dataset:
         futures.append(run.remote.aio(example["solution"]))
     all_outcomes = await asyncio.gather(*futures)
-    pdb.set_trace()
+    print(all_outcomes)
 
 
 #web_image = modal.Image.debian_slim(python_version="3.10")
