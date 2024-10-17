@@ -7,7 +7,7 @@ import json
 import pathlib
 import modal
 
-app = modal.App("swebench-server")
+app = modal.App("bcb-server")
 
 image = modal.Image.from_registry("bigcodebench/bigcodebench-evaluate")
 
