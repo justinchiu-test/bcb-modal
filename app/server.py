@@ -9,9 +9,9 @@ import modal
 
 app = modal.App("bcb-server")
 
-image = (modal.Image.from_registry("ubuntu:22.04", add_python="3.11")
+image = (modal.Image.from_registry("ubuntu:22.04", add_python="3.10")
     .run_commands("apt update")
-    .apt_install("clang")
+    .apt_install("clang", "git", "g++", "python3-tk", "zip", "unzip", "procps", "r-base")
     .copy_local_file("requirements.txt")
     .pip_install("uv")
     .run_commands(
