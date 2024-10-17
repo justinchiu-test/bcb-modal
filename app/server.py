@@ -10,6 +10,7 @@ import modal
 app = modal.App("bcb-server")
 
 image = (modal.Image.from_registry("ubuntu:22.04", add_python="3.10")
+    .env({"DEBIAN_FRONTEND": "noninteractive", "TZ": "America/New_York"})
     .run_commands("apt update")
     .apt_install("clang", "git", "g++", "python3-tk", "zip", "unzip", "procps", "r-base")
     .copy_local_file("requirements.txt")
@@ -57,13 +58,13 @@ async def main():
     pdb.set_trace()
 
 
-web_image = modal.Image.debian_slim(python_version="3.10")
+#web_image = modal.Image.debian_slim(python_version="3.10")
 
 
-@app.function(image=web_image, timeout=60*20)
-@modal.web_endpoint(
-    method="POST", label=f"runtest",
-)
-def runtest(data) -> list[str]:
-    """Generate responses to a batch of prompts, optionally with custom inference settings."""
-    return run.remote(data)
+#@app.function(image=web_image, timeout=60*20)
+#@modal.web_endpoint(
+#    method="POST", label=f"runtest",
+#)
+#def runtest(data) -> list[str]:
+#    """Generate responses to a batch of prompts, optionally with custom inference settings."""
+#    return run.remote(data)
