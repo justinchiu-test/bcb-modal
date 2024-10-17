@@ -26,22 +26,15 @@ image = (modal.Image.from_registry("ubuntu:22.04", add_python="3.11")
     cpu=1.0,
     concurrency_limit=64,
 )
-def run(example):
-    task_id = example["task_id"].replace("/", "-")
-
-    rundir = pathlib.Path(f"scratch/{task_id}")
-    rundir.mkdir(exist_ok=True, parents=True)
-
-    with (rundir / "run.py").open("w") as f:
-        f.write(example["solution"])
-        f.write("\n")
-        f.write(example["test"])
+def run(code):
+    with ("run.py").open("w") as f:
+        f.write(code)
 
     output = subprocess.check_output(
-        f"pytest scratch/{task_id}/run.py --json-report --json-report-file=scratch/{task_id}/report.json".split()
+        f"pytest run.py --json-report --json-report-file=report.json".split()
     )
 
-    with (rundir / "report.json").open("r") as f:
+    with ("report.json").open("r") as f:
         result = json.loads(f.read())
         outcomes = [test["outcome"] for test in result["tests"]]
         return outcomes
@@ -59,7 +52,7 @@ async def main():
 
     futures = []
     for example in dataset:
-        futures.append(run.remote.aio(example))
+        futures.append(run.remote.aio(example["solution"]))
     all_outcomes = await asyncio.gather(*futures)
     pdb.set_trace()
 
