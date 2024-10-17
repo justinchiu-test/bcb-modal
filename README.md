@@ -7,6 +7,8 @@ Install [uv](https://github.com/astral-sh/uv/tree/main?tab=readme-ov-file#instal
 curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
+and setup [modal](https://modal.com)
+
 ## Server
 To run the server, use
 ```
