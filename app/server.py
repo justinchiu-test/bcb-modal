@@ -9,15 +9,17 @@ import modal
 
 app = modal.App("bcb-server")
 
-image = (modal.Image.from_registry("ubuntu:22.04", add_python="3.10")
+# bcb dockerfile uses python 3.10, but i dont know how that's possible since llvmlite requires < 3.10
+# and it seems like one of the requirements requires llvmlite?
+image = (modal.Image.from_registry("ubuntu:22.04", add_python="3.9")
     .env({"DEBIAN_FRONTEND": "noninteractive", "TZ": "America/New_York"})
     .run_commands("apt update")
     .apt_install("clang", "git", "g++", "python3-tk", "zip", "unzip", "procps", "r-base")
+    # bigcodebench requirements, but with versions removed :laugh:
     .copy_local_file("requirements.txt")
     .pip_install("uv")
     .run_commands(
         "uv pip install --system -r requirements.txt",
-        #"pip install -r requirements.txt",
     )
 )
 
@@ -52,7 +54,7 @@ async def main():
     complete_dataset = dataset.map(combine_code_solution)
 
     futures = []
-    for example in dataset:
+    for example in complete_dataset:
         futures.append(run.remote.aio(example["solution"]))
     all_outcomes = await asyncio.gather(*futures)
     pdb.set_trace()
