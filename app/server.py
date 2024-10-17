@@ -1,10 +1,3 @@
-import asyncio
-import datasets
-import pdb
-import modal
-import subprocess
-import json
-import pathlib
 import modal
 
 app = modal.App("bcb-server")
@@ -20,7 +13,9 @@ image = (modal.Image.from_registry("ubuntu:22.04", add_python="3.9")
     .pip_install("uv")
     .run_commands(
         "uv pip install --system -r requirements.txt",
+        "uv pip install --system pytest pytest-json-report",
     )
+    .workdir("/test")
 )
 
 
@@ -30,14 +25,18 @@ image = (modal.Image.from_registry("ubuntu:22.04", add_python="3.9")
     concurrency_limit=64,
 )
 def run(code):
-    with ("run.py").open("w") as f:
+    import subprocess
+    import json
+    from pathlib import Path
+
+    with Path("run.py").open("w") as f:
         f.write(code)
 
     output = subprocess.check_output(
         f"pytest run.py --json-report --json-report-file=report.json".split()
     )
 
-    with ("report.json").open("r") as f:
+    with Path("report.json").open("r") as f:
         result = json.loads(f.read())
         outcomes = [test["outcome"] for test in result["tests"]]
         return outcomes
@@ -45,10 +44,18 @@ def run(code):
 
 @app.local_entrypoint()
 async def main():
+    import asyncio
+    import datasets
+    import pdb
     dataset = datasets.load_dataset("bigcode/bigcodebench", split="v0.1.2[:10]")
 
     def combine_code_solution(example):
-        example["solution"] = example["complete_prompt"] + example["canonical_solution"]
+        example["solution"] = (
+            example["complete_prompt"]
+            + example["canonical_solution"]
+            + "\n"
+            + example["test"]
+        )
         return example
 
     complete_dataset = dataset.map(combine_code_solution)
