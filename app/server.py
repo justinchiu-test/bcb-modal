@@ -9,7 +9,16 @@ import modal
 
 app = modal.App("bcb-server")
 
-image = modal.Image.from_registry("bigcodebench/bigcodebench-evaluate")
+image = (modal.Image.from_registry("ubuntu:22.04", add_python="3.11")
+    .run_commands("apt update")
+    .apt_install("clang")
+    .copy_local_file("requirements.txt")
+    .pip_install("uv")
+    .run_commands(
+        "uv pip install --system -r requirements.txt",
+        #"pip install -r requirements.txt",
+    )
+)
 
 
 @app.function(
@@ -51,7 +60,7 @@ async def main():
     futures = []
     for example in dataset:
         futures.append(run.remote.aio(example))
-    all_outcomes = asyncio.gather(*futures)
+    all_outcomes = await asyncio.gather(*futures)
     pdb.set_trace()
 
 
