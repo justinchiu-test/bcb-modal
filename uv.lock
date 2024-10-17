@@ -168,7 +168,9 @@ dependencies = [
     { name = "modal" },
     { name = "pytest" },
     { name = "pytest-json-report" },
+    { name = "requests" },
     { name = "ruff" },
+    { name = "tqdm" },
 ]
 
 [package.metadata]
@@ -177,7 +179,9 @@ requires-dist = [
     { name = "modal", specifier = ">=0.64.192" },
     { name = "pytest", specifier = ">=8.3.3" },
     { name = "pytest-json-report", specifier = ">=1.5.0" },
+    { name = "requests", specifier = ">=2.32.3" },
     { name = "ruff", specifier = ">=0.7.0" },
+    { name = "tqdm", specifier = ">=4.66.5" },
 ]
 
 [[package]]

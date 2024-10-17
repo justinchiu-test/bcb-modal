@@ -4,10 +4,13 @@ app = modal.App("bcb-server")
 
 # bcb dockerfile uses python 3.10, but i dont know how that's possible since llvmlite requires < 3.10
 # and it seems like one of the requirements requires llvmlite?
-image = (modal.Image.from_registry("ubuntu:22.04", add_python="3.9")
+image = (
+    modal.Image.from_registry("ubuntu:22.04", add_python="3.9")
     .env({"DEBIAN_FRONTEND": "noninteractive", "TZ": "America/New_York"})
     .run_commands("apt update")
-    .apt_install("clang", "git", "g++", "python3-tk", "zip", "unzip", "procps", "r-base")
+    .apt_install(
+        "clang", "git", "g++", "python3-tk", "zip", "unzip", "procps", "r-base"
+    )
     # bigcodebench requirements, but with versions removed :laugh:
     .copy_local_file("requirements.txt")
     .pip_install("uv")
@@ -47,6 +50,7 @@ async def main():
     import asyncio
     import datasets
     import pdb
+
     dataset = datasets.load_dataset("bigcode/bigcodebench", split="v0.1.2[:10]")
 
     def combine_code_solution(example):
@@ -70,15 +74,18 @@ async def main():
 from pydantic import BaseModel
 import asyncio
 
+
 class Request(BaseModel):
     codes: list[str]
+
 
 web_image = modal.Image.debian_slim(python_version="3.10")
 
 
-@app.function(image=web_image, timeout=60*20)
+@app.function(image=web_image, timeout=60 * 20)
 @modal.web_endpoint(
-    method="POST", label=f"runtest",
+    method="POST",
+    label=f"runtest",
 )
 async def runtest(data: Request) -> list[list[str]]:
     """Generate responses to a batch of prompts, optionally with custom inference settings."""
