@@ -4,6 +4,8 @@ from tqdm import tqdm
 
 
 def send_request(codes):
+    raise NotImplementedError
+    # Replace with your own url
     url = "https://justinchiu--runtest-dev.modal.run"
     response = requests.post(url, json={"codes": codes})
     return response.json()
@@ -27,17 +29,13 @@ def main():
     results = []
 
     for i in tqdm(range(0, len(complete_dataset), batch_size)):
-        batch = complete_dataset[i : i + batch_size]
-        codes = [example["solution"] for example in batch]
+        codes = complete_dataset["solution"][i : i + batch_size]
         batch_results = send_request(codes)
         results.extend(batch_results)
 
     print(f"Received {len(results)} results:")
     for i, result in enumerate(results):
         print(f"Result {i + 1}: {result}")
-    import pdb
-
-    pdb.set_trace()
 
 
 if __name__ == "__main__":

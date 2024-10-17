@@ -35,9 +35,14 @@ def run(code):
     with Path("run.py").open("w") as f:
         f.write(code)
 
-    output = subprocess.check_output(
-        f"pytest run.py --json-report --json-report-file=report.json".split()
+    result = subprocess.run(
+        f"pytest run.py --json-report --json-report-file=report.json",
+        shell=True,
+        capture_output=True,
+        text=True,
     )
+    print("Stdout:", result.stdout)
+    print("Stderr", result.stderr)
 
     with Path("report.json").open("r") as f:
         result = json.loads(f.read())
