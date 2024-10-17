@@ -67,13 +67,22 @@ async def main():
     print(all_outcomes)
 
 
-#web_image = modal.Image.debian_slim(python_version="3.10")
+from pydantic import BaseModel
+import asyncio
+
+class Request(BaseModel):
+    codes: list[str]
+
+web_image = modal.Image.debian_slim(python_version="3.10")
 
 
-#@app.function(image=web_image, timeout=60*20)
-#@modal.web_endpoint(
-#    method="POST", label=f"runtest",
-#)
-#def runtest(data) -> list[str]:
-#    """Generate responses to a batch of prompts, optionally with custom inference settings."""
-#    return run.remote(data)
+@app.function(image=web_image, timeout=60*20)
+@modal.web_endpoint(
+    method="POST", label=f"runtest",
+)
+async def runtest(data) -> list[list[str]]:
+    """Generate responses to a batch of prompts, optionally with custom inference settings."""
+    futures = []
+    for code in data.codes:
+        futures.append(run.remote.aio(code))
+    return await asyncio.gather(*futures)
