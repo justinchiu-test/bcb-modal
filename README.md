@@ -1,6 +1,12 @@
 # bcb-server
 Run bigcodebench execution stuff.
 
+## Installation
+Install [uv](https://github.com/astral-sh/uv/tree/main?tab=readme-ov-file#installation)
+```
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
 ## Server
 To run the server, use
 ```
